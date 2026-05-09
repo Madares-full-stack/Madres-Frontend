@@ -52,7 +52,6 @@ const Page = () => {
 
       setAttendance(attendanceData);
       setGrades(gradesData);
-      console.log(gradesData)
       setTasks(tasksRes.data.data);
       setLessons(lessonsRes.data.data);
 

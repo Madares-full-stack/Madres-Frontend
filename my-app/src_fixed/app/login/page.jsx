@@ -10,7 +10,6 @@ const Page = () => {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("");
 
   const login = async (e) => {
     e.preventDefault();
@@ -28,9 +27,9 @@ const Page = () => {
       const user = res.data.user;
 
       localStorage.setItem("token", res.data.token);
-      localStorage.setItem("userId", user.id);
+      localStorage.setItem("userId", user._id || user.id);
       localStorage.setItem("role", user.role);
-      localStorage.setItem("user",user.name)
+      localStorage.setItem("user", user.name)
 
       toast.success("Login successful");
 

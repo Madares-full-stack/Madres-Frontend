@@ -26,7 +26,6 @@ const Page = () => {
         ]);
 
       setAttendance(attendanceRes.data.attendance || []);
-      console.log(attendanceRes.data.attendance.students)
       setGrades(gradesRes.data.grades || []);
       setTasks(tasksRes.data.data || []);
       setLessons(lessonsRes.data.data || []);
