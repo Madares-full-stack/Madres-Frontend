@@ -6,7 +6,7 @@ import React, { useEffect, useState } from "react";
 
 const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const Router =useRouter();
+  const Router = useRouter();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -16,36 +16,48 @@ const Navbar = () => {
   const handleLogout = () => {
     localStorage.removeItem("token");
     setIsLoggedIn(false);
-    Router.push("/")
+    Router.push("/");
   };
 
   return (
-    <nav className="nav">
+    <nav className="nav shadow-sm">
       <div className="nav-logo">
         Mad<span>ares</span>
       </div>
 
       <div className="nav-links gap-3">
-        <Link className="text-decoration-none text-white" href="/contact">
+        {/* الروابط تظهر فقط إذا كانLoggedIn true */}
+        {isLoggedIn && (
+          <>
+            <Link className="nav-link text-white fw-medium px-3" href="/lessons">
+              Lessons
+            </Link>
+            <Link className="nav-link text-white fw-medium px-3" href="/schedule">
+              Schedule
+            </Link>
+          </>
+        )}
+
+        <Link className="text-decoration-none text-white px-3" href="/contact">
           Contact
         </Link>
 
-      <div className="nav-btn">
-        {!isLoggedIn ? (
-          <>
-            <Link href="/login" className="btn-primary">
-              Log in
-            </Link>
-            <Link href="/register" className="btn-warning">
-              Get started
-            </Link>
-          </>
-        ) : (
-          <button onClick={handleLogout} className="btn btn-danger">
-            Logout
-          </button>
-        )}
-      </div>
+        <div className="nav-btn ms-2">
+          {!isLoggedIn ? (
+            <>
+              <Link href="/login" className="btn-primary ms-2">
+                Log in
+              </Link>
+              <Link href="/register" className="btn-warning ms-2">
+                Get started
+              </Link>
+            </>
+          ) : (
+            <button onClick={handleLogout} className="btn btn-danger">
+              Logout
+            </button>
+          )}
+        </div>
       </div>
     </nav>
   );
