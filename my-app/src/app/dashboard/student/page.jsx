@@ -20,9 +20,9 @@ const Page = () => {
       const [attendanceRes, gradesRes, tasksRes, lessonsRes] =
         await Promise.all([
           api.get("/attendance/my"),
-          api.get("/grades"),
-          api.get("/tasks"),
-          api.get("/lessons"),
+          api.get("/grades/my"),
+          api.get("/tasks/my"),
+          api.get("/lessons/my"),
         ]);
 
       setAttendance(attendanceRes.data.attendance || []);

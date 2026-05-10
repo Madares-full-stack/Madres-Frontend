@@ -26,7 +26,6 @@ const Navbar = () => {
       </div>
 
       <div className="nav-links gap-3">
-        {/* الروابط تظهر فقط إذا كانLoggedIn true */}
         {isLoggedIn && (
           <>
             <Link className="nav-link text-white fw-medium px-3" href="/lessons">

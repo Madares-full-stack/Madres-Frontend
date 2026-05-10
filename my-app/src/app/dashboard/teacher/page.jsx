@@ -14,28 +14,31 @@ const Page = () => {
     fetchDashboard();
   }, []);
 
-  const fetchDashboard = async () => {
-    try {
-      const [scheduleRes, taskRes, gradeRes, attendanceRes] = await Promise.all(
-        [
-          api.get("/schedules"),
-          api.get("/tasks"),
-          api.get("/grades"),
-          api.get("/attendance"),
-        ],
-      );
+ const fetchDashboard = async () => {
+  try {
+    const teacherId = localStorage.getItem("userId");
 
-      setSchedules(scheduleRes.data.data || []);
-      setTasks(taskRes.data.data || []);
-      setGrades(gradeRes.data.grades || []);
-      setAttendance(attendanceRes.data.attendance || []);
-    } catch (err) {
-      console.log(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const [scheduleRes, taskRes, gradeRes, attendanceRes] = await Promise.all([
+      api.get("/schedules"),
+      api.get(`/tasks?teacherId=${teacherId}`),  
+      api.get("/grades"),
+      api.get("/attendance"),
+    ]);
 
+    const allTasks = taskRes.data.data || [];
+    const allGrades = gradeRes.data.grades || [];
+    const allAttendance = attendanceRes.data.attendance || [];
+
+    setSchedules(scheduleRes.data.data || []);
+    setTasks(allTasks);
+    setGrades(allGrades);
+    setAttendance(allAttendance);
+  } catch (err) {
+    console.log(err);
+  } finally {
+    setLoading(false);
+  }
+};
   const avgGrade =
     grades.length > 0
       ? (
@@ -60,10 +63,19 @@ const Page = () => {
           <h2 className="fw-bold">Teacher Dashboard</h2>
           <p className="text-muted">Welcome back 👋</p>
         </div>
+     <div className="d-flex gap-2">
+        <button className="btn btn-success  rounded-pill p-2 ">
+          <Link className="text-decoration-none text-white"  href="/lessons/create">
+          + New Lesson
+          </Link>
+          </button>
 
-        <button className="btn btn-primary rounded-pill px-4">
+          <button className="btn btn-primary  rounded-pill p-2 ">
+          <Link className="text-decoration-none text-white"  href="/dashboard/teacher/addTask">
           + New Task
+          </Link>
         </button>
+      </div>
       </div>
 
       <div className="row g-3 mb-4">

@@ -1,25 +1,26 @@
 "use client";
 
+import api from "@/api";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
+import { ArrowLeft, Save } from "lucide-react";
 import Link from "next/link";
-import api from "@/api";
-import { toast } from "react-hot-toast";
-import { ArrowLeft, BookPlus, Save } from "lucide-react";
 
-const CreateLessonPage = () => {
+const Page = () => {
   const router = useRouter();
   const [subjects, setSubjects] = useState([]);
   const [classes, setClasses] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
+
+  const [form, setForm] = useState({
     title: "",
     description: "",
     subjectId: "",
     classId: "",
+    dueDate: "",
+    maxScore: "",
   });
-  const [videoFile, setVideoFile] = useState(null);
-  const [lessonFile, setLessonFile] = useState(null);
 
   useEffect(() => {
     const fetchOptions = async () => {
@@ -38,32 +39,30 @@ const CreateLessonPage = () => {
   }, []);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+  const createTask = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
       const teacherId = localStorage.getItem("userId");
+      if (!teacherId) return toast.error("Teacher not found. Please login again.");
 
-      const data = new FormData();
-      data.append("title", formData.title);
-      data.append("description", formData.description);
-      data.append("subjectId", formData.subjectId);
-      data.append("classId", formData.classId);
-      data.append("teacherId", teacherId);
-      if (videoFile) data.append("video", videoFile);
-      if (lessonFile) data.append("file", lessonFile);
-
-      await api.post("/lessons", data, {
-        headers: { "Content-Type": "multipart/form-data" },
+      await api.post("/tasks", {
+        title: form.title,
+        description: form.description,
+        subjectId: form.subjectId,
+        classId: form.classId,
+        dueDate: form.dueDate,
+        teacherId,
+        maxScore: Number(form.maxScore),
       });
 
-      toast.success("Lesson created successfully!");
-      router.push("/lessons");
-    } catch (error) {
-      toast.error(error?.response?.data?.message || "Failed to create lesson");
+      toast.success("Task created successfully");
+      router.push("/dashboard/teacher");
+    } catch (err) {
+      toast.error(err?.response?.data?.message || err.message);
     } finally {
       setLoading(false);
     }
@@ -72,29 +71,23 @@ const CreateLessonPage = () => {
   return (
     <div className="bg-light min-vh-100 py-5">
       <div className="container" style={{ maxWidth: "700px" }}>
+
         <Link
-          href="/lessons"
+          href="/dashboard/teacher"
           className="text-decoration-none text-secondary d-inline-flex align-items-center gap-2 mb-4"
         >
           <ArrowLeft size={18} />
-          <span className="fw-medium">Back to Lessons</span>
+          <span className="fw-medium">Back to Dashboard</span>
         </Link>
 
         <div className="card shadow-sm border-0 rounded-4 bg-white">
           <div className="card-header bg-white border-0 pt-4 px-4">
-            <div className="d-flex align-items-center gap-3">
-              <div className="bg-primary bg-opacity-10 p-3 rounded-circle text-primary">
-                <BookPlus size={26} />
-              </div>
-              <div>
-                <h4 className="mb-0 fw-bold">Create New Lesson</h4>
-                <p className="text-muted mb-0 small">Fill in the details below</p>
-              </div>
-            </div>
+            <h4 className="fw-bold mb-0">Create New Task</h4>
+            <p className="text-muted small mb-0">Fill in the details below</p>
           </div>
 
           <div className="card-body p-4">
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={createTask}>
 
               <div className="mb-3">
                 <label className="form-label fw-semibold">Title</label>
@@ -102,8 +95,21 @@ const CreateLessonPage = () => {
                   type="text"
                   className="form-control rounded-3"
                   name="title"
-                  placeholder="e.g., Introduction to Algebra"
-                  value={formData.title}
+                  placeholder="Task title"
+                  value={form.title}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div className="mb-3">
+                <label className="form-label fw-semibold">Description</label>
+                <textarea
+                  className="form-control rounded-3"
+                  name="description"
+                  rows="3"
+                  placeholder="Task description"
+                  value={form.description}
                   onChange={handleChange}
                   required
                 />
@@ -115,7 +121,7 @@ const CreateLessonPage = () => {
                   <select
                     className="form-select rounded-3"
                     name="subjectId"
-                    value={formData.subjectId}
+                    value={form.subjectId}
                     onChange={handleChange}
                     required
                   >
@@ -130,7 +136,7 @@ const CreateLessonPage = () => {
                   <select
                     className="form-select rounded-3"
                     name="classId"
-                    value={formData.classId}
+                    value={form.classId}
                     onChange={handleChange}
                     required
                   >
@@ -142,53 +148,34 @@ const CreateLessonPage = () => {
                 </div>
               </div>
 
-              <div className="mb-3">
-                <label className="form-label fw-semibold">Description</label>
-                <textarea
-                  className="form-control rounded-3"
-                  name="description"
-                  rows="4"
-                  placeholder="Write the lesson content here..."
-                  value={formData.description}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-
-           
-              <div className="mb-3">
-                <label className="form-label fw-semibold">Video (optional)</label>
-                <input
-                  type="file"
-                  className="form-control rounded-3"
-                  accept="video/*"
-                  onChange={(e) => setVideoFile(e.target.files[0])}
-                />
-                {videoFile && (
-                  <small className="text-muted mt-1 d-block">
-                    ✅ {videoFile.name}
-                  </small>
-                )}
-              </div>
-
-              {/* File Upload */}
-              <div className="mb-4">
-                <label className="form-label fw-semibold">File / PDF (optional)</label>
-                <input
-                  type="file"
-                  className="form-control rounded-3"
-                  accept=".pdf,.doc,.docx,.ppt,.pptx"
-                  onChange={(e) => setLessonFile(e.target.files[0])}
-                />
-                {lessonFile && (
-                  <small className="text-muted mt-1 d-block">
-                    ✅ {lessonFile.name}
-                  </small>
-                )}
+              <div className="row mb-4 g-3">
+                <div className="col-md-6">
+                  <label className="form-label fw-semibold">Due Date</label>
+                  <input
+                    type="date"
+                    className="form-control rounded-3"
+                    name="dueDate"
+                    value={form.dueDate}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+                <div className="col-md-6">
+                  <label className="form-label fw-semibold">Max Score</label>
+                  <input
+                    type="number"
+                    className="form-control rounded-3"
+                    name="maxScore"
+                    placeholder="e.g. 100"
+                    value={form.maxScore}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
               </div>
 
               <div className="d-flex justify-content-end gap-2">
-                <Link href="/lessons" className="btn btn-light px-4 rounded-pill">
+                <Link href="/dashboard/teacher" className="btn btn-light px-4 rounded-pill">
                   Cancel
                 </Link>
                 <button
@@ -201,7 +188,7 @@ const CreateLessonPage = () => {
                   ) : (
                     <Save size={18} />
                   )}
-                  Save Lesson
+                  Create Task
                 </button>
               </div>
 
@@ -213,4 +200,4 @@ const CreateLessonPage = () => {
   );
 };
 
-export default CreateLessonPage;
+export default Page;
