@@ -6,6 +6,7 @@ import Link from "next/link";
 import api from "@/api";
 import { toast } from "react-hot-toast";
 import { ArrowLeft, BookPlus, Save } from "lucide-react";
+import Footer from "@/app/component/Footer";
 
 const CreateLessonPage = () => {
   const router = useRouter();
@@ -70,6 +71,7 @@ const CreateLessonPage = () => {
   };
 
   return (
+    <div>
     <div className="bg-light min-vh-100 py-5">
       <div className="container" style={{ maxWidth: "700px" }}>
         <Link
@@ -171,7 +173,6 @@ const CreateLessonPage = () => {
                 )}
               </div>
 
-              {/* File Upload */}
               <div className="mb-4">
                 <label className="form-label fw-semibold">File / PDF (optional)</label>
                 <input
@@ -209,6 +210,8 @@ const CreateLessonPage = () => {
           </div>
         </div>
       </div>
+    </div>
+    <Footer/>
     </div>
   );
 };

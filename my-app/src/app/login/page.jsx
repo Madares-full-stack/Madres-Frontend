@@ -22,7 +22,8 @@ const Page = () => {
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("userId", user._id || user.id);
       localStorage.setItem("role", user.role);
-      localStorage.setItem("user", user.name);
+     localStorage.setItem("user", JSON.stringify({ name: user.name, role: user.role }))
+
 
       toast.success("Login successful");
 

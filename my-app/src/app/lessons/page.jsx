@@ -3,8 +3,10 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import api from "@/api";
-import { toast } from "react-hot-toast";
+import { toast, Toaster } from "react-hot-toast";
 import { BookOpen, Plus, Eye, Edit3, Trash2, Search, BookCheck } from "lucide-react";
+import Footer from "../component/Footer";
+import Navbar from "../component/Navbar";
 
 const LessonsPage = () => {
   const [lessons, setLessons] = useState([]);
@@ -49,6 +51,10 @@ const LessonsPage = () => {
     );
 
   return (
+    <div>
+      <Navbar/>
+      <Toaster />
+
     <div className="bg-light min-vh-100 py-4">
       <div className="container">
         <div className="row g-3 mb-4">
@@ -133,7 +139,10 @@ const LessonsPage = () => {
           </div>
         )}
       </div>
+     
     </div>
+     <Footer/>
+     </div>
   );
 };
 
