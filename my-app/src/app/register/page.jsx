@@ -120,7 +120,7 @@ export default function RegisterPage() {
           <div className="logo">Mad<span>ares</span></div>
           <p className="tagline">School Management System</p>
           <img
-            src="jaredd-craig-HH4WBGNyltc-unsplash.jpg"
+            src="/jaredd-craig-HH4WBGNyltc-unsplash.jpg"
             alt="school"
             className="img-fluid"
           />

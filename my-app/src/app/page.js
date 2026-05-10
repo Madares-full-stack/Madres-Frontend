@@ -29,7 +29,7 @@ export default function Home() {
 
         <div className="hero-image">
           <img
-            src="istockphoto-2249432606-1024x1024.jpg"
+            src="/istockphoto-2249432606-1024x1024.jpg"
             width={300}
             height={300}
             alt="School system"

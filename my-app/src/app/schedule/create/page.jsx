@@ -7,6 +7,13 @@ import api from "@/api";
 import { toast } from "react-hot-toast";
 import { CalendarCheck, User, BookOpen, Clock, Save, ArrowLeft } from "lucide-react";
 import Footer from "@/app/component/Footer";
+import Navbar from "@/app/component/Navbar";
+
+const getRoleName = (user) => {
+  if (!user) return "";
+  if (typeof user.role === "string") return user.role;
+  return user.role?.name || "";
+};
 
 const CreateSchedule = () => {
   const router = useRouter();
@@ -35,7 +42,7 @@ const CreateSchedule = () => {
         setSubjects(subRes.data.subjects || subRes.data.data || []);
         setClasses(classRes.data.classes || classRes.data.data || []);
         const allUsers = userRes.data.users || userRes.data.data || [];
-        setTeachers(allUsers.filter((u) => u.role?.name === "teacher"));
+        setTeachers(allUsers.filter((u) => getRoleName(u) === "teacher"));
       } catch (err) {
         toast.error("Failed to load options");
       }
@@ -58,8 +65,10 @@ const CreateSchedule = () => {
   };
 
   return (
-    <div className="bg-light min-vh-100 py-5">
-      <div className="container" style={{ maxWidth: "700px" }}>
+    <div>
+      <Navbar />
+      <div className="bg-light min-vh-100 py-5">
+        <div className="container" style={{ maxWidth: "700px" }}>
 
         <Link
           href="/schedule"
@@ -197,7 +206,8 @@ const CreateSchedule = () => {
           </form>
         </div>
       </div>
-      <Footer/>
+        </div>
+        <Footer />
     </div>
   );
 };

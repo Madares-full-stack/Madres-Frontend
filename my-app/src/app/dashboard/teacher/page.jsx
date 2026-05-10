@@ -12,34 +12,35 @@ const Page = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const fetchDashboard = async () => {
+      try {
+        const teacherId = localStorage.getItem("userId");
+
+        const [scheduleRes, taskRes, gradeRes, attendanceRes] =
+          await Promise.all([
+            api.get("/schedules"),
+            api.get(`/tasks?teacherId=${teacherId}`),
+            api.get("/grades"),
+            api.get("/attendance"),
+          ]);
+
+        const allTasks = taskRes.data.data || [];
+        const allGrades = gradeRes.data.grades || [];
+        const allAttendance = attendanceRes.data.attendance || [];
+
+        setSchedules(scheduleRes.data.data || []);
+        setTasks(allTasks);
+        setGrades(allGrades);
+        setAttendance(allAttendance);
+      } catch (err) {
+        console.log(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchDashboard();
   }, []);
-
- const fetchDashboard = async () => {
-  try {
-    const teacherId = localStorage.getItem("userId");
-
-    const [scheduleRes, taskRes, gradeRes, attendanceRes] = await Promise.all([
-      api.get("/schedules"),
-      api.get(`/tasks?teacherId=${teacherId}`),  
-      api.get("/grades"),
-      api.get("/attendance"),
-    ]);
-
-    const allTasks = taskRes.data.data || [];
-    const allGrades = gradeRes.data.grades || [];
-    const allAttendance = attendanceRes.data.attendance || [];
-
-    setSchedules(scheduleRes.data.data || []);
-    setTasks(allTasks);
-    setGrades(allGrades);
-    setAttendance(allAttendance);
-  } catch (err) {
-    console.log(err);
-  } finally {
-    setLoading(false);
-  }
-};
   const avgGrade =
     grades.length > 0
       ? (
@@ -75,6 +76,12 @@ const Page = () => {
           <button className="btn btn-primary  rounded-pill p-2 ">
           <Link className="text-decoration-none text-white"  href="/dashboard/teacher/addTask">
           + New Task
+          </Link>
+        </button>
+
+          <button className="btn btn-warning  rounded-pill p-2 ">
+          <Link className="text-decoration-none text-dark"  href="/grades/create">
+          + New Grade
           </Link>
         </button>
       </div>
@@ -189,7 +196,6 @@ const Page = () => {
           <div className="card border-0 shadow-sm rounded-4">
             <div className="card-body">
               <h4 className="fw-bold mb-4">Latest Tasks</h4>
-              <button className="btn btn-outline-primary">Create</button>
 
               {tasks.length === 0 ? (
                 <p className="text-muted">No tasks found</p>
@@ -210,6 +216,9 @@ const Page = () => {
           <div className="card border-0 shadow-sm rounded-4">
             <div className="card-body">
               <h4 className="fw-bold mb-4">Latest Grades</h4>
+              <Link href="/grades" className="btn btn-outline-primary btn-sm mb-3">
+                View Grades
+              </Link>
 
               {grades.length === 0 ? (
                 <p className="text-muted">No grades found</p>

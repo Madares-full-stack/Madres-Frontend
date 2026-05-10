@@ -3,44 +3,63 @@
 import React, { useEffect, useState } from "react";
 import api from "@/api";
 import Link from "next/link";
-import Chatbot from "@/app/component/chatbot";
+import Chatbot from "@/app/component/Chatbot";
 import Footer from "@/app/component/Footer";
+
+const getClassId = (item) => item?.classId?._id || item?.classId || "";
 
 const Page = () => {
   const [attendance, setAttendance] = useState([]);
   const [grades, setGrades] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [lessons, setLessons] = useState([]);
+  const [schedules, setSchedules] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchDashboard();
+    const loadDashboard = async () => {
+      try {
+        const [
+          attendanceRes,
+          gradesRes,
+          tasksRes,
+          lessonsRes,
+        ] = await Promise.all([
+          api.get("/attendance/my"),
+          api.get("/grades/my"),
+          api.get("/tasks/my"),
+          api.get("/lessons/my"),
+        ]);
+
+        const attendanceData = attendanceRes.data.attendance || [];
+        const gradesData = gradesRes.data.grades || gradesRes.data.data || [];
+        const tasksData = tasksRes.data.data || [];
+        const lessonsData = lessonsRes.data.data || [];
+        const classId =
+          getClassId(attendanceData.find(getClassId)) ||
+          getClassId(lessonsData.find(getClassId)) ||
+          getClassId(tasksData.find(getClassId));
+
+        const schedulesRes = classId
+          ? await api
+              .get(`/schedules?classId=${classId}`)
+              .catch(() => ({ data: { data: [] } }))
+          : { data: { data: [] } };
+
+        setAttendance(attendanceData);
+        setGrades(gradesData);
+        setTasks(tasksData);
+        setLessons(lessonsData);
+        setSchedules(schedulesRes.data.data || []);
+      } catch (err) {
+        console.log(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadDashboard();
   }, []);
-
-  const fetchDashboard = async () => {
-    try {
-      const [
-        attendanceRes,
-        gradesRes,
-        tasksRes,
-        lessonsRes,
-      ] = await Promise.all([
-        api.get("/attendance/my"),
-        api.get("/grades"),
-        api.get("/tasks"),
-        api.get("/lessons"),
-      ]);
-
-      setAttendance(attendanceRes.data.attendance || []);
-      setGrades(gradesRes.data.grades || []);
-      setTasks(tasksRes.data.data || []);
-      setLessons(lessonsRes.data.data || []);
-    } catch (err) {
-      console.log(err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const presentCount = attendance.filter(
     (a) => a.status === "present"
@@ -57,6 +76,18 @@ const Page = () => {
           100
         ).toFixed(1)
       : 0;
+
+  const studentClassId =
+    getClassId(attendance.find(getClassId)) ||
+    getClassId(lessons.find(getClassId)) ||
+    getClassId(tasks.find(getClassId));
+
+  const studentSchedules = studentClassId
+    ? schedules.filter(
+        (schedule) =>
+          (schedule.classId?._id || schedule.classId) === studentClassId,
+      )
+    : schedules;
 
   if (loading) {
     return (
@@ -263,6 +294,54 @@ const Page = () => {
                 )}
               </div>
             </div>
+          </div>
+        </div>
+
+        <div className="card border-0 shadow-sm rounded-4 mt-4">
+          <div className="card-body">
+            <div className="d-flex justify-content-between align-items-center mb-4">
+              <h4 className="fw-bold mb-0">My Schedule</h4>
+
+              <Link href="/schedule" className="btn btn-outline-primary btn-sm">
+                View All
+              </Link>
+            </div>
+
+            {studentSchedules.length === 0 ? (
+              <p className="text-muted mb-0">No schedule found</p>
+            ) : (
+              <div className="row g-3">
+                {studentSchedules.slice(0, 6).map((schedule) => (
+                  <div key={schedule._id} className="col-md-4">
+                    <div className="border rounded-4 p-3 h-100">
+                      <div className="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                          <h6 className="fw-bold mb-1">
+                            {schedule.subjectId?.name || "Subject"}
+                          </h6>
+
+                          <small className="text-muted">
+                            {schedule.teacherId?.name || "Teacher"}
+                          </small>
+                        </div>
+
+                        <span className="badge bg-primary">
+                          {schedule.day}
+                        </span>
+                      </div>
+
+                      <div className="text-muted small">
+                        {schedule.startTime} - {schedule.endTime}
+                      </div>
+
+                      <div className="text-muted small">
+                        {schedule.classId?.name}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 

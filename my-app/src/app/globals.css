@@ -1419,3 +1419,283 @@ table {
 }
 .subjects-submit-btn:hover:not(.subjects-submit-btn--loading) { background: #0EA5E9; }
 .subjects-submit-btn--loading { opacity: 0.6; cursor: not-allowed; }
+
+/* =========================
+   RESPONSIVE APP OVERRIDES
+========================= */
+
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+}
+
+body {
+  min-width: 0;
+}
+
+.container,
+.container-fluid {
+  max-width: 100%;
+}
+
+.card,
+.card-body,
+.card-header {
+  min-width: 0;
+}
+
+.row {
+  min-width: 0;
+}
+
+.table-responsive {
+  width: 100%;
+  -webkit-overflow-scrolling: touch;
+}
+
+td,
+th {
+  vertical-align: middle;
+}
+
+textarea.form-control {
+  min-height: 120px;
+  height: auto;
+}
+
+.btn {
+  white-space: normal;
+}
+
+@media (max-width: 992px) {
+  .container,
+  .container-fluid {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  .dashboard-layout {
+    min-height: auto;
+  }
+
+  .sidebar {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    min-height: 0;
+    padding: 8px;
+    gap: 6px;
+  }
+
+  .nav-item-custom {
+    border-radius: 10px;
+    padding: 10px 14px;
+  }
+
+  .nav-item-active {
+    border-left: 0;
+    border-bottom: 3px solid #3b82f6;
+  }
+
+  .login-left,
+  .register-left {
+    min-height: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  nav,
+  nav.d-flex {
+    height: auto;
+    min-height: 60px;
+    flex-direction: row;
+    align-items: center !important;
+    gap: 12px;
+    padding: 12px 16px !important;
+    flex-wrap: wrap;
+  }
+
+  nav > .d-flex {
+    width: 100%;
+    justify-content: space-between;
+    gap: 10px !important;
+    flex-wrap: wrap;
+  }
+
+  nav .position-absolute.end-0 {
+    right: auto !important;
+    left: 0;
+  }
+
+  .notif-dropdown {
+    position: fixed;
+    top: 70px;
+    left: 12px;
+    right: 12px;
+    width: auto;
+  }
+
+  .hero {
+    gap: 24px;
+  }
+
+  .hero-text,
+  .hero-image {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .login-right,
+  .register-right {
+    padding: 24px 16px;
+  }
+
+  .login-card,
+  .register-card {
+    max-width: 100%;
+  }
+
+  .card-body.p-5,
+  .card-body.p-md-5 {
+    padding: 24px !important;
+  }
+
+  .d-flex.justify-content-between,
+  .d-flex.justify-content-end {
+    flex-wrap: wrap;
+  }
+
+  .d-flex.justify-content-between > *,
+  .d-flex.justify-content-end > * {
+    min-width: 0;
+  }
+
+  .chat-container {
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .chat-main {
+    min-height: 520px;
+  }
+
+  .subjects-page {
+    padding: 24px 12px;
+  }
+
+  .subjects-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 576px) {
+  h1,
+  .h1 {
+    font-size: 1.8rem;
+  }
+
+  h2,
+  .h2 {
+    font-size: 1.5rem;
+  }
+
+  h3,
+  .h3 {
+    font-size: 1.25rem;
+  }
+
+  table {
+    min-width: 560px;
+  }
+
+  .table th,
+  .table td {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .card {
+    border-radius: 12px !important;
+  }
+
+  .card-body {
+    padding: 16px;
+  }
+
+  .btn-primary,
+  .btn-warning,
+  .btn-outline-primary,
+  .btn-outline-secondary,
+  .btn-light,
+  .btn-danger,
+  .btn-success {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .badge.fs-6 {
+    width: 100%;
+    text-align: center;
+    padding: 10px;
+  }
+
+  .chatbot-floating-btn {
+    width: 56px;
+    height: 56px;
+    bottom: 16px;
+    right: 16px;
+    font-size: 24px;
+  }
+
+  .chatbot-widget {
+    left: 10px;
+    right: 10px;
+    bottom: 82px;
+    width: auto;
+    height: min(620px, calc(100vh - 110px));
+    border-radius: 16px;
+  }
+
+  .chatbot-bubble {
+    max-width: 88%;
+    word-break: break-word;
+  }
+
+  .subjects-header,
+  .subjects-card-actions,
+  .subjects-form-btns {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .subjects-add-btn,
+  .subjects-edit-btn,
+  .subjects-delete-btn,
+  .subjects-cancel-btn,
+  .subjects-submit-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 420px) {
+  nav,
+  nav.d-flex {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+
+  .container,
+  .container-fluid {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+
+  table {
+    min-width: 500px;
+  }
+
+  .input-group {
+    flex-wrap: nowrap;
+  }
+}

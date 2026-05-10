@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import api from "@/api";
 import { useRouter } from "next/navigation";
+import Footer from "../component/Footer";
+import Navbar from "../component/Navbar";
 
 const Page = () => {
   const [name, setName] = useState("");
@@ -53,7 +55,9 @@ const Page = () => {
   };
 
   return (
-    <div className="container mt-5">
+    <div>
+      <Navbar/>
+    <div className="container mt-5 mb-5">
       <div className="card shadow p-4 rounded-4">
         <h3 className="text-center mb-4">Add Class</h3>
 
@@ -107,6 +111,9 @@ const Page = () => {
         }}>Back</button>
         </div>
       </div>
+    </div>
+    <Footer/>
+    
     </div>
   );
 };

@@ -12,9 +12,7 @@ const Footer = () => {
         <Link href="/contact">Contact</Link>
       </div>
 
-      <div className="footer-links">
-        <Link href="/privacy">Privacy Policy</Link>
-      </div>
+    
     </footer>
   );
 };

@@ -7,6 +7,7 @@ import api from "@/api";
 import { toast } from "react-hot-toast";
 import { ArrowLeft, BookPlus, Save } from "lucide-react";
 import Footer from "@/app/component/Footer";
+import Navbar from "@/app/component/Navbar";
 
 const CreateLessonPage = () => {
   const router = useRouter();
@@ -72,6 +73,7 @@ const CreateLessonPage = () => {
 
   return (
     <div>
+      <Navbar/>
     <div className="bg-light min-vh-100 py-5">
       <div className="container" style={{ maxWidth: "700px" }}>
         <Link

@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { ArrowLeft, Save } from "lucide-react";
 import Link from "next/link";
+import Navbar from "@/app/component/Navbar";
+import Footer from "@/app/component/Footer";
 
 const Page = () => {
   const router = useRouter();
@@ -70,6 +72,7 @@ const Page = () => {
 
   return (
     <div className="bg-light min-vh-100 py-5">
+      <Navbar/>
       <div className="container" style={{ maxWidth: "700px" }}>
 
         <Link
@@ -196,6 +199,7 @@ const Page = () => {
           </div>
         </div>
       </div>
+      <Footer/>
     </div>
   );
 };

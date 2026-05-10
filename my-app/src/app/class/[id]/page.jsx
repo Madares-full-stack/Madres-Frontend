@@ -1,6 +1,8 @@
 "use client";
 
 import api from "@/api";
+import Footer from "@/app/component/Footer";
+import Navbar from "@/app/component/Navbar";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -29,6 +31,8 @@ const Page = () => {
   }
 
   return (
+    <div>
+      <Navbar/>
     <div className="container mt-5 text-white">
       <div className="card-dark p-4 rounded">
         <h1>{classes.name}</h1>
@@ -54,6 +58,8 @@ const Page = () => {
             Router.back()
          }}>Back</button>
       </div>
+    </div>
+    <Footer/>
     </div>
   );
 };

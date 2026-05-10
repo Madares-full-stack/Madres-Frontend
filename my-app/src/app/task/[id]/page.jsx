@@ -2,6 +2,7 @@
 
 import api from "@/api";
 import { useParams } from "next/navigation";
+import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
@@ -9,24 +10,25 @@ const Page = () => {
   const { id } = useParams();
 
   const [task, setTask] = useState(null);
-
-  const getTask = async () => {
-    try {
-      const res = await api.get(`/tasks/${id}`);
-
-      const data = res.data.data;
-
-      setTask(data);
-
-      console.log(data);
-    } catch (err) {
-      toast.error(err.message);
-    }
-  };
+  const [role] = useState(() =>
+    typeof window === "undefined" ? "" : localStorage.getItem("role") || ""
+  );
 
   useEffect(() => {
-    getTask();
-  }, []);
+    const loadTask = async () => {
+      try {
+        const res = await api.get(`/tasks/${id}`);
+
+        setTask(res.data.data);
+      } catch (err) {
+        toast.error(err.message);
+      }
+    };
+
+    if (id) {
+      loadTask();
+    }
+  }, [id]);
 
   if (!task) {
     return (
@@ -61,6 +63,15 @@ const Page = () => {
             ? new Date(task.dueDate).toLocaleDateString()
             : "No due date"}
         </div>
+
+        {role === "student" && (
+          <Link
+            href={`/submission/create?task=${task._id}`}
+            className="btn btn-primary rounded-pill mt-3"
+          >
+            Submit This Task
+          </Link>
+        )}
       </div>
     </div>
   );
