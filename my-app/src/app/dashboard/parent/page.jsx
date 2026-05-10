@@ -173,7 +173,9 @@ const Page = () => {
           <div>
             <h2 className="fw-bold">Parent Dashboard</h2>
 
-            <p className="text-muted mb-0">Monitor your children&apos;s progress</p>
+            <p className="text-muted mb-0">
+              Monitor your children&apos;s progress
+            </p>
           </div>
         </div>
 
@@ -227,7 +229,7 @@ const Page = () => {
                   <h4 className="fw-bold mb-1">{currentChild?.name}</h4>
 
                   <p className="text-muted mb-0">
-                    {currentChild?.classId?.name || "No class"}
+                    {activeChildClassFromRoster?.name || "No class"}
                   </p>
                 </div>
               </div>
