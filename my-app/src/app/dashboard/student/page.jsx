@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import api from "@/api";
 import Link from "next/link";
 import Chatbot from "@/app/component/chatbot";
+import Footer from "@/app/component/Footer";
 
 const Page = () => {
   const [attendance, setAttendance] = useState([]);
@@ -299,7 +300,7 @@ const Page = () => {
                         </p>
 
                         <Link
-                          href={`/lesson/${lesson._id}`}
+                          href={`/lessons/${lesson._id}`}
                         >
                           <button className="btn btn-primary w-100">
                             Open Lesson
@@ -314,7 +315,7 @@ const Page = () => {
         </div>
       </div>
 
-      
+      <Footer/>
       <Chatbot />
     </>
   );

@@ -187,7 +187,6 @@ export default function RegisterPage() {
                   <option value="student">Student</option>
                   <option value="teacher">Teacher</option>
                   <option value="parent">Parent</option>
-                  <option value="admin">Administrator</option>
                 </select>
                 {errors.role && <div className="invalid-feedback">{errors.role}</div>}
               </div>

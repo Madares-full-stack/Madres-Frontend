@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import api from "@/api";
 import Link from "next/link";
+import Footer from "@/app/component/Footer";
 const Page = () => {
   const [schedules, setSchedules] = useState([]);
   const [tasks, setTasks] = useState([]);
@@ -57,6 +58,7 @@ const Page = () => {
   }
 
   return (
+    <div>
     <div className="container py-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <div>
@@ -227,6 +229,8 @@ const Page = () => {
           </div>
         </div>
       </div>
+    </div>
+     <Footer/>
     </div>
   );
 };

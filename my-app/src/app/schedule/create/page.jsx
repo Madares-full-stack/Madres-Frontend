@@ -6,6 +6,7 @@ import Link from "next/link";
 import api from "@/api";
 import { toast } from "react-hot-toast";
 import { CalendarCheck, User, BookOpen, Clock, Save, ArrowLeft } from "lucide-react";
+import Footer from "@/app/component/Footer";
 
 const CreateSchedule = () => {
   const router = useRouter();
@@ -196,6 +197,7 @@ const CreateSchedule = () => {
           </form>
         </div>
       </div>
+      <Footer/>
     </div>
   );
 };

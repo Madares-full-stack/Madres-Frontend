@@ -5,13 +5,16 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import api from "@/api";
 import { toast } from "react-hot-toast";
+import {useRouter} from "next/navigation";
 import { ArrowLeft, Clock, Calendar, Download, BookOpen } from "lucide-react";
+import Footer from "@/app/component/Footer";
+import Navbar from "@/app/component/Navbar";
 
 const LessonDetails = () => {
   const { id } = useParams();
   const [lesson, setLesson] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const Router =useRouter();
   useEffect(() => {
     const fetchLesson = async () => {
       try {
@@ -38,21 +41,22 @@ const LessonDetails = () => {
       <div className="text-center mt-5">
         <p className="text-muted">Lesson not found</p>
         <Link href="/lessons" className="btn btn-primary rounded-pill">
-          Back to Lessons
+          Back 
         </Link>
       </div>
     );
 
   return (
     <div className="bg-white min-vh-100">
+      <Navbar/>
       <div className="container py-5">
-        <Link
-          href="/lessons"
-          className="text-decoration-none text-secondary d-inline-flex align-items-center gap-2 mb-4"
+        <button className="btn btn-link text-decoration-none text-secondary d-inline-flex align-items-center gap-2 mb-4"
+          onClick={() => Router.back()}
         >
           <ArrowLeft size={18} />
-          <span className="fw-medium">Back to Lessons</span>
-        </Link>
+          <span className="fw-medium">Back</span>
+        </button>
+         
 
         <div className="row g-5">
           <div className="col-lg-8">
@@ -126,6 +130,7 @@ const LessonDetails = () => {
           </div>
         </div>
       </div>
+       <Footer/>
     </div>
   );
 };

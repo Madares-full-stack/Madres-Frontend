@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import "@/app/globals.css";
+import api from "@/api";
 
 const Chatbot = () => {
   const router = useRouter();
@@ -79,7 +80,6 @@ const Chatbot = () => {
       const token = localStorage.getItem("token");
       const API = "http://localhost:5000";
 
-      // تنظيف الهستوري (مهم جداً لـ Groq)
       const cleanHistory = updatedMessages.filter(
         (msg) =>
           msg.role === "user" ||
@@ -87,12 +87,7 @@ const Chatbot = () => {
           msg.role === "system"
       );
 
-      const res = await fetch(`${API}/api/chatbot`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+      const res = await api.post(`/chatbot`, {
         body: JSON.stringify({
           message: text,
           history: cleanHistory,

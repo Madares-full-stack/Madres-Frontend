@@ -1,62 +1,116 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import Notifications from "./Notifications";
+import { MessageCircle, User, LogOut } from "lucide-react";
 
 const Navbar = () => {
+  const router = useRouter();
+
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const Router = useRouter();
+  const [user, setUser] = useState(null);
+  const [showMenu, setShowMenu] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     setIsLoggedIn(!!token);
+
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch {
+        setUser({ name: storedUser });
+      }
+    }
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    localStorage.clear();
     setIsLoggedIn(false);
-    Router.push("/");
+    router.push("/login");
   };
 
   return (
-    <nav className="nav shadow-sm">
-      <div className="nav-logo">
-        Mad<span>ares</span>
+    <nav
+      className="d-flex justify-content-between align-items-center px-4 py-3 shadow-sm"
+      style={{ backgroundColor: "#122438" }}
+    >
+      {/* Logo */}
+      <div className="fw-bold fs-4 text-white">
+        Mad<span style={{ color: "#f97316" }}>ares</span>
       </div>
 
-      <div className="nav-links gap-3">
-        {isLoggedIn && (
-          <>
-            <Link className="nav-link text-white fw-medium px-3" href="/lessons">
-              Lessons
-            </Link>
-            <Link className="nav-link text-white fw-medium px-3" href="/schedule">
-              Schedule
-            </Link>
-          </>
-        )}
+      {/* Links */}
+      <div className="d-flex align-items-center gap-3">
 
-        <Link className="text-decoration-none text-white px-3" href="/contact">
+        <Link href="/contact" className="text-white text-decoration-none">
           Contact
         </Link>
 
-        <div className="nav-btn ms-2">
-          {!isLoggedIn ? (
-            <>
-              <Link href="/login" className="btn-primary ms-2">
-                Log in
-              </Link>
-              <Link href="/register" className="btn-warning ms-2">
-                Get started
-              </Link>
-            </>
-          ) : (
-            <button onClick={handleLogout} className="btn btn-danger">
-              Logout
-            </button>
-          )}
-        </div>
+        {isLoggedIn ? (
+          <>
+            <Notifications user={user} />
+
+            {/* User Menu */}
+            <div className="position-relative">
+              <div
+                onClick={() => setShowMenu(!showMenu)}
+                className="d-flex align-items-center gap-2 text-white"
+                style={{ cursor: "pointer" }}
+              >
+                <div
+                  className="rounded-circle d-flex justify-content-center align-items-center"
+                  style={{
+                    width: "38px",
+                    height: "38px",
+                    backgroundColor: "#22c55e",
+                  }}
+                >
+                  {user?.name?.[0]?.toUpperCase() || "U"}
+                </div>
+
+                <span>{user?.name || "User"}</span>
+              </div>
+
+              {showMenu && (
+                <div
+                  className="position-absolute end-0 mt-2 bg-white shadow rounded-3 p-2"
+                  style={{ width: "180px", zIndex: 999 }}
+                >
+                  <Link
+                    href="/message"
+                    className="text-decoration-none d-block mb-2"
+                  >
+                    <div className="d-flex align-items-center gap-2 px-2 py-2 rounded-2 bg-dark text-white">
+                      <MessageCircle size={16} />
+                      Messages
+                    </div>
+                  </Link>
+
+                  <button
+                    onClick={handleLogout}
+                    className="btn btn-danger w-100 d-flex align-items-center justify-content-center gap-2"
+                  >
+                    <LogOut size={16} />
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
+          </>
+        ) : (
+          <>
+            <Link href="/login" className="text-white">
+              Login
+            </Link>
+            <Link href="/register" className="btn btn-warning btn-sm">
+              Get Started
+            </Link>
+          </>
+        )}
       </div>
     </nav>
   );
