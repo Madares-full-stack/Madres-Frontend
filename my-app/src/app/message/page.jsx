@@ -76,11 +76,11 @@ const Page = () => {
     if (!content.trim() || !selectedUser) return;
 
     try {
-      await api.post("/messages", {
+     const res = await api.post("/messages", {
         receiver: selectedUser._id,
         content,
       });
-      // ✅ لا نضيف الرسالة يدوياً — socket "receive_message" يتكفل بذلك للجميع
+     setMessages((prev) => [...prev, res.data.message]);
       setContent("");
       inputRef.current?.focus();
     } catch (err) {

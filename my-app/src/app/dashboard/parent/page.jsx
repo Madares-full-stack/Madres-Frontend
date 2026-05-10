@@ -3,9 +3,10 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   CalendarCheck,
+  CalendarDays,
   GraduationCap,
-  ClipboardList,
   BookOpen,
+  Clock,
   AlertTriangle,
   CheckCircle2,
   AlertCircle,
@@ -23,11 +24,16 @@ const gradeColor = (score) => {
   return "#ef4444";
 };
 
+const getClassId = (item) => item?.classId?._id || item?.classId || "";
+const getId = (item) => item?._id || item || "";
+
 const Page = () => {
   const [attendance, setAttendance] = useState([]);
   const [grades, setGrades] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [lessons, setLessons] = useState([]);
+  const [schedules, setSchedules] = useState([]);
+  const [classes, setClasses] = useState([]);
 
   const [children, setChildren] = useState([]);
   const [activeChild, setActiveChild] = useState("");
@@ -35,54 +41,64 @@ const Page = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
-    try {
-      const [attendanceRes, gradesRes, tasksRes, lessonsRes] =
-        await Promise.all([
+    const loadData = async () => {
+      try {
+        const [
+          attendanceRes,
+          gradesRes,
+          tasksRes,
+          lessonsRes,
+          schedulesRes,
+          classesRes,
+        ] = await Promise.all([
           api.get("/attendance/my"),
           api.get("/grades/my"),
           api.get("/tasks/my"),
           api.get("/lessons/my"),
+          api.get("/schedules").catch(() => ({ data: { data: [] } })),
+          api.get("/classes").catch(() => ({ data: { classes: [] } })),
         ]);
 
-      const attendanceData = attendanceRes.data.attendance;
-      const gradesData = gradesRes.data.grades;
+        const attendanceData = attendanceRes.data.attendance;
+        const gradesData = gradesRes.data.grades;
 
-      setAttendance(attendanceData);
-      setGrades(gradesData);
-      setTasks(tasksRes.data.data);
-      setLessons(lessonsRes.data.data);
+        setAttendance(attendanceData);
+        setGrades(gradesData);
+        setTasks(tasksRes.data.data);
+        setLessons(lessonsRes.data.data);
+        setSchedules(schedulesRes.data.data || []);
+        setClasses(classesRes.data.classes || classesRes.data.data || []);
 
-      const childMap = new Map();
+        const childMap = new Map();
 
-      attendanceData.forEach((record) => {
-        if (record.studentId?._id) {
-          childMap.set(record.studentId._id, record.studentId);
+        attendanceData.forEach((record) => {
+          if (record.studentId?._id) {
+            childMap.set(record.studentId._id, record.studentId);
+          }
+        });
+
+        gradesData.forEach((grade) => {
+          if (grade.student?._id) {
+            childMap.set(grade.student._id, grade.student);
+          }
+        });
+
+        const childrenList = Array.from(childMap.values());
+
+        setChildren(childrenList);
+
+        if (childrenList.length > 0) {
+          setActiveChild(childrenList[0]._id);
         }
-      });
-
-      gradesData.forEach((grade) => {
-        if (grade.student?._id) {
-          childMap.set(grade.student._id, grade.student);
-        }
-      });
-
-      const childrenList = Array.from(childMap.values());
-
-      setChildren(childrenList);
-
-      if (childrenList.length > 0) {
-        setActiveChild(childrenList[0]._id);
+      } catch (err) {
+        toast.error(err?.response?.data?.message || "Failed to load dashboard");
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      toast.error(err?.response?.data?.message || "Failed to load dashboard");
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+
+    loadData();
+  }, []);
 
   const childAttendance = useMemo(() => {
     return attendance.filter((record) => record.studentId?._id === activeChild);
@@ -122,6 +138,25 @@ const Page = () => {
 
   const currentChild = children.find((child) => child._id === activeChild);
 
+  const activeChildClassFromAttendance = getClassId(
+    childAttendance.find(getClassId),
+  );
+  const activeChildClassFromRoster = classes.find((item) =>
+    item.students?.some((student) => getId(student) === activeChild),
+  );
+  const currentChildClassId =
+    getClassId(currentChild) ||
+    activeChildClassFromAttendance ||
+    activeChildClassFromRoster?._id ||
+    "";
+
+  const childSchedules = currentChildClassId
+    ? schedules.filter(
+        (schedule) =>
+          (schedule.classId?._id || schedule.classId) === currentChildClassId,
+      )
+    : schedules;
+
   if (loading) {
     return (
       <div className="d-flex justify-content-center align-items-center vh-100">
@@ -138,7 +173,7 @@ const Page = () => {
           <div>
             <h2 className="fw-bold">Parent Dashboard</h2>
 
-            <p className="text-muted mb-0">Monitor your children's progress</p>
+            <p className="text-muted mb-0">Monitor your children&apos;s progress</p>
           </div>
         </div>
 
@@ -319,6 +354,48 @@ const Page = () => {
               </div>
 
               <div className="col-lg-5">
+                <div className="card border-0 shadow-sm rounded-4 mb-4">
+                  <div className="card-body">
+                    <div className="d-flex justify-content-between align-items-center mb-4">
+                      <h4 className="fw-bold mb-0">Class Schedule</h4>
+
+                      <CalendarDays className="text-success" />
+                    </div>
+
+                    {childSchedules.length === 0 ? (
+                      <p className="text-muted mb-0">No schedule found</p>
+                    ) : (
+                      childSchedules.slice(0, 5).map((schedule) => (
+                        <div
+                          key={schedule._id}
+                          className="border rounded-4 p-3 mb-3"
+                        >
+                          <div className="d-flex justify-content-between align-items-start">
+                            <div>
+                              <h6 className="fw-bold mb-1">
+                                {schedule.subjectId?.name || "Subject"}
+                              </h6>
+
+                              <small className="text-muted">
+                                {schedule.teacherId?.name || "Teacher"}
+                              </small>
+                            </div>
+
+                            <span className="badge bg-success">
+                              {schedule.day}
+                            </span>
+                          </div>
+
+                          <div className="d-flex align-items-center gap-2 text-muted small mt-2">
+                            <Clock size={14} />
+                            {schedule.startTime} - {schedule.endTime}
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+
                 <div className="card border-0 shadow-sm rounded-4 mb-4">
                   <div className="card-body">
                     <h4 className="fw-bold mb-4">Attendance Summary</h4>

@@ -5,55 +5,76 @@ import { useRouter } from "next/navigation";
 import "@/app/globals.css";
 import api from "@/api";
 
+const getInitialChatState = () => {
+  if (typeof window === "undefined") {
+    return {
+      authorized: null,
+      messages: [],
+      shouldRedirect: false,
+    };
+  }
+
+  const stored = localStorage.getItem("user");
+  const token = localStorage.getItem("token");
+
+  if (!stored || !token) {
+    return {
+      authorized: false,
+      messages: [],
+      shouldRedirect: true,
+    };
+  }
+
+  let parsed;
+
+  try {
+    parsed = JSON.parse(stored);
+  } catch {
+    parsed = {
+      name: stored,
+      role: "student",
+    };
+  }
+
+  if (parsed.role !== "student") {
+    return {
+      authorized: false,
+      messages: [],
+      shouldRedirect: false,
+    };
+  }
+
+  return {
+    authorized: true,
+    messages: [
+      {
+        role: "assistant",
+        content: `أهلاً ${parsed.name}! 👋 أنا مساعدك الذكي، كيف يمكنني مساعدتك اليوم؟`,
+      },
+    ],
+    shouldRedirect: false,
+  };
+};
+
 const Chatbot = () => {
   const router = useRouter();
+  const [chatState] = useState(getInitialChatState);
 
-  const [user, setUser] = useState(null);
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState(chatState.messages);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [authorized, setAuthorized] = useState(null);
+  const [authorized] = useState(chatState.authorized);
   const [open, setOpen] = useState(false);
 
   const bottomRef = useRef(null);
   const inputRef = useRef(null);
 
-  // Load user
+  // Redirect guests
   useEffect(() => {
-    const stored = localStorage.getItem("user");
-    const token = localStorage.getItem("token");
-
-    if (!stored || !token) {
+    if (chatState.shouldRedirect) {
       router.push("/login");
-      return;
     }
-
-    let parsed;
-
-    try {
-      parsed = JSON.parse(stored);
-    } catch {
-      parsed = {
-        name: stored,
-        role: "student",
-      };
-    }
-
-    setUser(parsed);
-
-    if (parsed.role !== "student") {
-      setAuthorized(false);
-    } else {
-      setAuthorized(true);
-
-      setMessages([
-        {
-          role: "assistant",
-          content: `أهلاً ${parsed.name}! 👋 أنا مساعدك الذكي، كيف يمكنني مساعدتك اليوم؟`,
-        },
-      ]);
-    }
-  }, []);
+  }, [chatState.shouldRedirect, router]);
 
   // Scroll
   useEffect(() => {
@@ -77,9 +98,6 @@ const Chatbot = () => {
     setLoading(true);
 
     try {
-      const token = localStorage.getItem("token");
-      const API = "http://localhost:5000";
-
       const cleanHistory = updatedMessages.filter(
         (msg) =>
           msg.role === "user" ||
@@ -87,31 +105,26 @@ const Chatbot = () => {
           msg.role === "system"
       );
 
-      const res = await api.post(`/chatbot`, {
-        body: JSON.stringify({
-          message: text,
-          history: cleanHistory,
-        }),
+      const res = await api.post("/chatbot", {
+        message: text,
+        history: cleanHistory,
       });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || "حدث خطأ");
-      }
 
       const assistantMsg = {
         role: "assistant",
-        content: data.reply,
+        content: res.data.reply,
       };
 
       setMessages((prev) => [...prev, assistantMsg]);
     } catch (err) {
+      const message =
+        err.response?.data?.message || err.response?.data?.error || err.message;
+
       setMessages((prev) => [
         ...prev,
         {
           role: "assistant",
-          content: "❌ " + err.message,
+          content: "❌ " + message,
         },
       ]);
     } finally {

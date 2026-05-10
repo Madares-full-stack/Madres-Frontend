@@ -38,12 +38,13 @@ const Navbar = () => {
       className="d-flex justify-content-between align-items-center px-4 py-3 shadow-sm"
       style={{ backgroundColor: "#122438" }}
     >
-      {/* Logo */}
       <div className="fw-bold fs-4 text-white">
-        Mad<span style={{ color: "#f97316" }}>ares</span>
+        <Link href="/" className="text-decoration-none text-white">
+          Mad<span style={{ color: "#f97316" }}>ares</span>
+        </Link>
       </div>
+     
 
-      {/* Links */}
       <div className="d-flex align-items-center gap-3">
 
         <Link href="/contact" className="text-white text-decoration-none">
@@ -54,7 +55,6 @@ const Navbar = () => {
           <>
             <Notifications user={user} />
 
-            {/* User Menu */}
             <div className="position-relative">
               <div
                 onClick={() => setShowMenu(!showMenu)}

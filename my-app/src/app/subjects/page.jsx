@@ -10,7 +10,7 @@ export default function SubjectsPage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [showForm, setShowForm] = useState(false);
-  const [editSubject, setEditSubject] = useState(null); // null = add, object = edit
+  const [editSubject, setEditSubject] = useState(null); 
   const [form, setForm] = useState({ name: "", teacher: "" });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -29,7 +29,7 @@ export default function SubjectsPage() {
 
   const fetchSubjects = async (token) => {
     try {
-      const res = await fetch("http://localhost:5000/api/subjects", {
+      const res = await fetch("http://localhost:5000/api/subject", {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -95,7 +95,7 @@ export default function SubjectsPage() {
     const isEdit = !!editSubject;
     try {
       const res = await fetch(
-        `http://localhost:5000/api/subjects${isEdit ? `/${editSubject._id}` : ""}`,
+        `http://localhost:5000/api/subject${isEdit ? `/${editSubject._id}` : ""}`,
         {
           method: isEdit ? "PUT" : "POST",
           headers: {
@@ -121,7 +121,7 @@ export default function SubjectsPage() {
     if (!confirm("هل أنت متأكد من حذف هذه المادة؟")) return;
     const token = localStorage.getItem("token");
     try {
-      const res = await fetch(`http://localhost:5000/api/subjects/${id}`, {
+      const res = await fetch(`http://localhost:5000/api/subject/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -137,7 +137,6 @@ export default function SubjectsPage() {
     <div className="subjects-page">
       <div className="subjects-container">
 
-        {/* Header */}
         <div className="subjects-header">
           <div>
             <h1 className="subjects-title">📚 المواد الدراسية</h1>
@@ -150,12 +149,10 @@ export default function SubjectsPage() {
           )}
         </div>
 
-        {/* Error */}
         {error && !showForm && (
           <div className="subjects-error">{error}</div>
         )}
 
-        {/* Modal Form */}
         {showForm && isAdmin && (
           <div className="subjects-overlay" onClick={closeForm}>
             <div className="subjects-modal" onClick={(e) => e.stopPropagation()}>

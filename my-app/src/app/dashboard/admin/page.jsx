@@ -184,13 +184,24 @@ const Page = () => {
 
           <NavItem
             label="Subject"
-            href="/dashboard/admin/addSubject"
+            href="/subjects"
           />
 
           <NavItem
             label="Attendance"
             href="/dashboard/admin/addAttendance"
           />
+            
+          <NavItem
+            label="Schedule"
+            href="/schedule/create"
+          />
+
+          <NavItem
+            label="Grades"
+            href="/grades"
+          />
+
 
           <NavItem
             label="Submission"
