@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from 'react';
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -34,7 +35,7 @@ const getCurrentUserId = () => {
   return (localStorage.getItem("userId") || "").replace(/"/g, "");
 };
 
-const CreateSubmissionPage = () => {
+const CreateSubmissionComponent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const taskId = searchParams.get("task") || "";
@@ -204,4 +205,10 @@ const CreateSubmissionPage = () => {
   );
 };
 
-export default CreateSubmissionPage;
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <CreateSubmissionComponent />
+    </Suspense>
+  );
+}
