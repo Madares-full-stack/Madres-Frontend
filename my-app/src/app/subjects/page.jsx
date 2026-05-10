@@ -1,11 +1,14 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import useSWR from 'swr';
 
 export default function SubjectsPage() {
   const router = useRouter();
   const [user, setUser] = useState(null);
+  const [subjects, setSubjects] = useState([]);
+  const [teachers, setTeachers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editSubject, setEditSubject] = useState(null); 
   const [form, setForm] = useState({ name: "", teacher: "" });
@@ -20,17 +23,38 @@ export default function SubjectsPage() {
     if (!stored || !token) { router.push("/login"); return; }
     const parsed = JSON.parse(stored);
     setUser(parsed);
+    fetchSubjects(token);
+    fetchTeachers(token);
   }, []);
 
-  const fetcher = (url) => fetch(url, {
-    headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-  }).then(res => res.json()).then(data => data.success ? data.data : []);
+  const fetchSubjects = async (token) => {
+    try {
+      const res = await fetch("http://localhost:5000/api/subject", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (data.success) setSubjects(data.data);
+    } catch {
+      setError("تعذر تحميل المواد");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const { data: subjects, error: subjectsError, mutate: mutateSubjects } = useSWR(user ? "http://localhost:5000/api/subject" : null, fetcher);
-  const { data: teachersData } = useSWR(user ? "http://localhost:5000/api/users" : null, fetcher);
-  const teachers = teachersData ? teachersData.filter(u => u.role?.name === "teacher" || u.role === "teacher") : [];
-
-  const loading = !subjects && !subjectsError;
+  const fetchTeachers = async (token) => {
+    try {
+      const res = await fetch("http://localhost:5000/api/users", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (data.success) {
+        const teacherList = data.users.filter(
+          (u) => u.role?.name === "teacher" || u.role === "teacher"
+        );
+        setTeachers(teacherList);
+      }
+    } catch {}
+  };
 
   const openAddForm = () => {
     setEditSubject(null);
@@ -84,7 +108,7 @@ export default function SubjectsPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "حدث خطأ");
       setSuccess(isEdit ? "تم تعديل المادة بنجاح ✅" : "تمت إضافة المادة بنجاح ✅");
-      mutateSubjects();
+      fetchSubjects(token);
       setTimeout(() => closeForm(), 1200);
     } catch (err) {
       setError(err.message);
@@ -103,7 +127,7 @@ export default function SubjectsPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message);
-      mutateSubjects(subjects.filter((s) => s._id !== id), false);
+      setSubjects((prev) => prev.filter((s) => s._id !== id));
     } catch (err) {
       setError(err.message);
     }
@@ -113,6 +137,7 @@ export default function SubjectsPage() {
     <div className="subjects-page">
       <div className="subjects-container">
 
+        {/* Header */}
         <div className="subjects-header">
           <div>
             <h1 className="subjects-title">📚 المواد الدراسية</h1>
@@ -125,10 +150,12 @@ export default function SubjectsPage() {
           )}
         </div>
 
+        {/* Error */}
         {error && !showForm && (
           <div className="subjects-error">{error}</div>
         )}
 
+        {/* Modal Form */}
         {showForm && isAdmin && (
           <div className="subjects-overlay" onClick={closeForm}>
             <div className="subjects-modal" onClick={(e) => e.stopPropagation()}>
