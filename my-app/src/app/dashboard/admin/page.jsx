@@ -179,7 +179,7 @@ const Page = () => {
 
           <NavItem
             label="Add Lessons"
-            href="/dashboard/admin/addLesson"
+            href="/lessons/create"
           />
 
           <NavItem

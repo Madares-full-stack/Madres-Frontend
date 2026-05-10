@@ -43,8 +43,8 @@ const Page = () => {
         await Promise.all([
           api.get("/attendance/my"),
           api.get("/grades/my"),
-          api.get("/tasks"),
-          api.get("/lessons"),
+          api.get("/tasks/my"),
+          api.get("/lessons/my"),
         ]);
 
       const attendanceData = attendanceRes.data.attendance;
