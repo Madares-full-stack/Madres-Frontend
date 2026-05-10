@@ -21,18 +21,19 @@ export default function Home() {
             <a href="/register" className="btn-warning">
               Get Started
             </a>
-            <a href="/about" className="btn-primary">
+            {/* <a href="/about" className="btn-primary">
               Learn More
-            </a>
+            </a> */}
           </div>
         </div>
 
         <div className="hero-image">
-          <img
+          <Image
             src="/istockphoto-2249432606-1024x1024.jpg"
             width={300}
             height={300}
             alt="School system"
+            priority
           />
         </div>
       </section>
