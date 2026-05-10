@@ -6,14 +6,14 @@ import Link from "next/link";
 import Chatbot from "@/app/component/Chatbot";
 import Footer from "@/app/component/Footer";
 
-const getClassId = (item) => item?.classId?._id || item?.classId || "";
-
 const Page = () => {
   const [attendance, setAttendance] = useState([]);
   const [grades, setGrades] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [lessons, setLessons] = useState([]);
   const [schedules, setSchedules] = useState([]);
+  const [studentClass, setStudentClass] = useState(null);
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -24,35 +24,56 @@ const Page = () => {
           gradesRes,
           tasksRes,
           lessonsRes,
+          classRes,
         ] = await Promise.all([
           api.get("/attendance/my"),
           api.get("/grades/my"),
           api.get("/tasks/my"),
           api.get("/lessons/my"),
+          api.get("/classes/my-class"),
         ]);
 
-        const attendanceData = attendanceRes.data.attendance || [];
-        const gradesData = gradesRes.data.grades || gradesRes.data.data || [];
-        const tasksData = tasksRes.data.data || [];
-        const lessonsData = lessonsRes.data.data || [];
-        const classId =
-          getClassId(attendanceData.find(getClassId)) ||
-          getClassId(lessonsData.find(getClassId)) ||
-          getClassId(tasksData.find(getClassId));
+        const attendanceData =
+          attendanceRes.data.attendance || [];
 
-        const schedulesRes = classId
-          ? await api
-              .get(`/schedules?classId=${classId}`)
-              .catch(() => ({ data: { data: [] } }))
-          : { data: { data: [] } };
+        const gradesData =
+          gradesRes.data.grades ||
+          gradesRes.data.data ||
+          [];
+
+        const tasksData =
+          tasksRes.data.data || [];
+
+        const lessonsData =
+          lessonsRes.data.data || [];
+
+        const classData =
+          classRes.data.class;
+
+        const currentClass = Array.isArray(classData)
+          ? classData[0]
+          : classData;
+
+        let schedulesData = [];
+
+        if (currentClass?._id) {
+          const schedulesRes = await api.get(
+            `/schedules?classId=${currentClass._id}`
+          );
+
+          schedulesData =
+            schedulesRes.data.data || [];
+        }
 
         setAttendance(attendanceData);
         setGrades(gradesData);
         setTasks(tasksData);
         setLessons(lessonsData);
-        setSchedules(schedulesRes.data.data || []);
+
+        setStudentClass(currentClass);
+        setSchedules(schedulesData);
       } catch (err) {
-        console.log(err);
+        console.error(err);
       } finally {
         setLoading(false);
       }
@@ -77,17 +98,13 @@ const Page = () => {
         ).toFixed(1)
       : 0;
 
-  const studentClassId =
-    getClassId(attendance.find(getClassId)) ||
-    getClassId(lessons.find(getClassId)) ||
-    getClassId(tasks.find(getClassId));
-
-  const studentSchedules = studentClassId
+  const studentSchedules = studentClass?._id
     ? schedules.filter(
-        (schedule) =>
-          (schedule.classId?._id || schedule.classId) === studentClassId,
+        (s) =>
+          (s.classId?._id || s.classId) ===
+          studentClass._id
       )
-    : schedules;
+    : [];
 
   if (loading) {
     return (
@@ -100,85 +117,74 @@ const Page = () => {
   return (
     <>
       <div className="container py-4">
-        <div className="d-flex justify-content-between align-items-center mb-4">
-          <div>
-            <h2 className="fw-bold">
-              Student Dashboard
-            </h2>
+        <div className="mb-4">
+          <h2 className="fw-bold">
+            Student Dashboard
+          </h2>
 
-            <p className="text-muted mb-0">
-              Welcome back
-            </p>
-          </div>
+          <p className="text-muted mb-0">
+            Welcome back
+          </p>
+
+          <p className="text-primary fw-semibold mt-2">
+            Class:{" "}
+            {studentClass?.name || "No class"}
+          </p>
         </div>
 
+        {/* Stats */}
         <div className="row mb-4">
-          <div className="col-md-3 mb-3">
-            <div className="card border-0 shadow-sm rounded-4">
-              <div className="card-body">
-                <h6 className="text-muted">
-                  Lessons
-                </h6>
+          {[
+            {
+              label: "Lessons",
+              value: lessons.length,
+              color: "text-primary",
+            },
+            {
+              label: "Tasks",
+              value: tasks.length,
+              color: "text-warning",
+            },
+            {
+              label: "Attendance",
+              value: `${attendanceRate}%`,
+              color: "text-success",
+            },
+            {
+              label: "Grades",
+              value: grades.length,
+              color: "text-danger",
+            },
+          ].map(({ label, value, color }) => (
+            <div
+              className="col-md-3 mb-3"
+              key={label}
+            >
+              <div className="card border-0 shadow-sm rounded-4">
+                <div className="card-body">
+                  <h6 className="text-muted">
+                    {label}
+                  </h6>
 
-                <h2 className="fw-bold text-primary">
-                  {lessons.length}
-                </h2>
+                  <h2
+                    className={`fw-bold ${color}`}
+                  >
+                    {value}
+                  </h2>
+                </div>
               </div>
             </div>
-          </div>
-
-          <div className="col-md-3 mb-3">
-            <div className="card border-0 shadow-sm rounded-4">
-              <div className="card-body">
-                <h6 className="text-muted">
-                  Tasks
-                </h6>
-
-                <h2 className="fw-bold text-warning">
-                  {tasks.length}
-                </h2>
-              </div>
-            </div>
-          </div>
-
-          <div className="col-md-3 mb-3">
-            <div className="card border-0 shadow-sm rounded-4">
-              <div className="card-body">
-                <h6 className="text-muted">
-                  Attendance
-                </h6>
-
-                <h2 className="fw-bold text-success">
-                  {attendanceRate}%
-                </h2>
-              </div>
-            </div>
-          </div>
-
-          <div className="col-md-3 mb-3">
-            <div className="card border-0 shadow-sm rounded-4">
-              <div className="card-body">
-                <h6 className="text-muted">
-                  Grades
-                </h6>
-
-                <h2 className="fw-bold text-danger">
-                  {grades.length}
-                </h2>
-              </div>
-            </div>
-          </div>
+          ))}
         </div>
 
         <div className="row">
+          {/* Tasks */}
           <div className="col-lg-8 mb-4">
             <div className="card border-0 shadow-sm rounded-4">
               <div className="card-body">
-                <div className="d-flex justify-content-between align-items-center mb-4">
-                  <h4 className="fw-bold">
-                    Latest Tasks
-                  </h4>
-                </div>
+                <h4 className="fw-bold mb-4">
+                  Latest Tasks
+                </h4>
 
                 {tasks.length === 0 ? (
                   <p className="text-muted">
@@ -221,6 +227,7 @@ const Page = () => {
             </div>
           </div>
 
+          {/* Attendance + Grades */}
           <div className="col-lg-4">
             <div className="card border-0 shadow-sm rounded-4 mb-4">
               <div className="card-body">
@@ -297,61 +304,87 @@ const Page = () => {
           </div>
         </div>
 
+        {/* Schedule */}
         <div className="card border-0 shadow-sm rounded-4 mt-4">
           <div className="card-body">
             <div className="d-flex justify-content-between align-items-center mb-4">
-              <h4 className="fw-bold mb-0">My Schedule</h4>
+              <h4 className="fw-bold mb-0">
+                My Schedule
+              </h4>
 
-              <Link href="/schedule" className="btn btn-outline-primary btn-sm">
+              <Link
+                href="/schedule"
+                className="btn btn-outline-primary btn-sm"
+              >
                 View All
               </Link>
             </div>
 
             {studentSchedules.length === 0 ? (
-              <p className="text-muted mb-0">No schedule found</p>
+              <p className="text-muted mb-0">
+                No schedule found
+              </p>
             ) : (
               <div className="row g-3">
-                {studentSchedules.slice(0, 6).map((schedule) => (
-                  <div key={schedule._id} className="col-md-4">
-                    <div className="border rounded-4 p-3 h-100">
-                      <div className="d-flex justify-content-between align-items-start mb-2">
-                        <div>
-                          <h6 className="fw-bold mb-1">
-                            {schedule.subjectId?.name || "Subject"}
-                          </h6>
+                {studentSchedules
+                  .slice(0, 6)
+                  .map((schedule) => (
+                    <div
+                      key={schedule._id}
+                      className="col-md-4"
+                    >
+                      <div className="border rounded-4 p-3 h-100">
+                        <div className="d-flex justify-content-between align-items-start mb-2">
+                          <div>
+                            <h6 className="fw-bold mb-1">
+                              {schedule
+                                .subjectId
+                                ?.name ||
+                                "Subject"}
+                            </h6>
 
-                          <small className="text-muted">
-                            {schedule.teacherId?.name || "Teacher"}
-                          </small>
+                            <small className="text-muted">
+                              {schedule
+                                .teacherId
+                                ?.name ||
+                                "Teacher"}
+                            </small>
+                          </div>
+
+                          <span className="badge bg-primary">
+                            {schedule.day}
+                          </span>
                         </div>
 
-                        <span className="badge bg-primary">
-                          {schedule.day}
-                        </span>
-                      </div>
+                        <div className="text-muted small">
+                          {
+                            schedule.startTime
+                          }{" "}
+                          -{" "}
+                          {schedule.endTime}
+                        </div>
 
-                      <div className="text-muted small">
-                        {schedule.startTime} - {schedule.endTime}
-                      </div>
-
-                      <div className="text-muted small">
-                        {schedule.classId?.name}
+                        <div className="text-muted small">
+                          {
+                            schedule
+                              .classId
+                              ?.name
+                          }
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
               </div>
             )}
           </div>
         </div>
 
+        {/* Lessons */}
         <div className="card border-0 shadow-sm rounded-4 mt-4">
           <div className="card-body">
-            <div className="d-flex justify-content-between align-items-center mb-4">
-              <h4 className="fw-bold">
-                Latest Lessons
-              </h4>
-            </div>
+            <h4 className="fw-bold mb-4">
+              Latest Lessons
+            </h4>
 
             <div className="row">
               {lessons.length === 0 ? (
@@ -373,7 +406,8 @@ const Page = () => {
 
                         <p className="text-muted">
                           {
-                            lesson.subjectId
+                            lesson
+                              .subjectId
                               ?.name
                           }
                         </p>
@@ -394,7 +428,7 @@ const Page = () => {
         </div>
       </div>
 
-      <Footer/>
+      <Footer />
       <Chatbot />
     </>
   );
