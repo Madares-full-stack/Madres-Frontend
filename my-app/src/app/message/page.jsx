@@ -22,7 +22,7 @@ const Page = () => {
  useEffect(() => {
   if (!myId) return;
 
-  socketRef.current = io("http://localhost:5000");
+  socketRef.current = io("https://madres-backend-9.onrender.com");
 
   socketRef.current.on("connect", () => {
     socketRef.current.emit("register", myId);

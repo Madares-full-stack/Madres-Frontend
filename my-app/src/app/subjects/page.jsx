@@ -29,7 +29,7 @@ export default function SubjectsPage() {
 
   const fetchSubjects = async (token) => {
     try {
-      const res = await fetch("http://localhost:5000/api/subject", {
+      const res = await fetch("https://madres-backend-9.onrender.com/api/subject", {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -43,7 +43,7 @@ export default function SubjectsPage() {
 
   const fetchTeachers = async (token) => {
     try {
-      const res = await fetch("http://localhost:5000/api/users", {
+      const res = await fetch("https://madres-backend-9.onrender.com/api/users", {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -95,7 +95,7 @@ export default function SubjectsPage() {
     const isEdit = !!editSubject;
     try {
       const res = await fetch(
-        `http://localhost:5000/api/subject${isEdit ? `/${editSubject._id}` : ""}`,
+        `https://madres-backend-9.onrender.com/api/subject${isEdit ? `/${editSubject._id}` : ""}`,
         {
           method: isEdit ? "PUT" : "POST",
           headers: {
@@ -121,7 +121,7 @@ export default function SubjectsPage() {
     if (!confirm("هل أنت متأكد من حذف هذه المادة؟")) return;
     const token = localStorage.getItem("token");
     try {
-      const res = await fetch(`http://localhost:5000/api/subject/${id}`, {
+      const res = await fetch(`https://madres-backend-9.onrender.com/api/subject/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });

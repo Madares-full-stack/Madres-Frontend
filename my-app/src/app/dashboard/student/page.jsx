@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import api from "@/api";
 import Link from "next/link";
-import Chatbot from "@/app/component/Chatbot";
+import Chatbot from "@/app/component/chatbot";
 import Footer from "@/app/component/Footer";
 
 const Page = () => {
