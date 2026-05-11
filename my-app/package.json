@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "overrides": {
-    "react-side-effect": "^3.0.0"
+
+  "react-side-effect": "2.1.2"
   },
   "scripts": {
     "dev": "next dev",
