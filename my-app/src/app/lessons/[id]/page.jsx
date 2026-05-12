@@ -90,7 +90,7 @@ const LessonDetails = () => {
 
               {lesson.fileUrl ? (
                 <a
-                  href={`https://madres-backend-9.onrender.com/uploads/${lesson.fileUrl}`}
+                  href={`https://madres-backend-9.onrender.com/api/uploads/${lesson.fileUrl}`}
                   className="btn btn-outline-primary w-100 rounded-pill mb-3 d-flex align-items-center justify-content-center gap-2"
                   download
                 >
@@ -111,7 +111,7 @@ const LessonDetails = () => {
                   <video
                     controls
                     className="w-100 rounded-3"
-                    src={`https://madres-backend-9.onrender.com/uploads/${lesson.videoUrl}`}
+                    src={`https://madres-backend-9.onrender.com/api/uploads/${lesson.videoUrl}`}
                   />
                 </div>
               )}

@@ -72,7 +72,6 @@ const Page = () => {
 
   return (
     <div className="bg-light min-vh-100 py-5">
-      <Navbar/>
       <div className="container" style={{ maxWidth: "700px" }}>
 
         <Link

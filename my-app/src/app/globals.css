@@ -540,6 +540,7 @@ nav {
   color: #64748b;
   margin-top: 1.25rem;
   margin-bottom: 0;
+  
 }
 
 .footer-txt a {
@@ -893,6 +894,8 @@ table {
   padding: 20px;
   text-align: center;
   color: white;
+  margin-bottom: 0;
+  
 }
 
 .footer-links {
